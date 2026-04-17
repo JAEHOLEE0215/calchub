@@ -724,7 +724,7 @@ const annuityCalculator: CalculatorConfig = {
       // A값: 전체 가입자 평균소득월액 (약 298만원)
       // B값: 본인 평균소득월액
       const aValue = 2989352
-      const bValue = Math.min(avgIncome, 5900000) // 상한액 적용
+      const bValue = Math.min(avgIncome, 5900000) // 상한액 ���용
 
       // 소득대체율: 2024년 기준 약 40% (20년 가입 기준)
       // 가입년수 1년 추가당 약 0.5%p 증가
@@ -894,63 +894,169 @@ const exchangeRateCalculator: CalculatorConfig = {
 // REAL ESTATE CALCULATORS (부동산)
 // ============================================
 
-// 9. 전세대출 계산기 - LTV 80% 한도
+// 9. 전세대출 계산기 - 2025년 6.27 대책 및 10.15 대책 반영
 const jeonseLoanCalculator: CalculatorConfig = {
   slug: "jeonse-loan",
   name: "전세대출 계산기",
-  description: "전세자금대출 한도와 월 이자를 계산합니다. LTV 80% 한도 자동 계산.",
+  description: "전세자금대출 한도와 월 이자를 계산합니다. 2025년 6.27/10.15 대책 반영.",
   category: "realestate",
   iconName: "Home",
-  legalBasis: "2024년 주택금융공사 기준",
+  legalBasis: "2025년 6.27 대책, 10.15 대책 기준",
   inputs: [
     { id: "jeonsePrice", label: "전세금", type: "number", placeholder: "300000000", suffix: "원", defaultValue: 300000000 },
     { id: "deposit", label: "보유 자금 (자기자금)", type: "number", placeholder: "50000000", suffix: "원", defaultValue: 50000000 },
     { id: "rate", label: "대출금리", type: "number", placeholder: "3.5", suffix: "%", defaultValue: 3.5, step: 0.1 },
+    { id: "region", label: "지역", type: "select", options: [
+      { value: "seoul", label: "서울" },
+      { value: "regulated12", label: "경기 규제지역 12곳 (과천, 성남 등)" },
+      { value: "metropolitan", label: "수도권 (서울/경기/인천)" },
+      { value: "other", label: "지방 (비수도권)" },
+    ], defaultValue: "seoul" },
+    { id: "isFirstHome", label: "생애최초 주택 여부", type: "radio", options: [
+      { value: "yes", label: "생애최초 (LTV 70%)" },
+      { value: "no", label: "일반" },
+    ], defaultValue: "no" },
     { id: "hasGuarantee", label: "전세보증보험", type: "radio", options: [
       { value: "yes", label: "가입 (보증료 0.128%)" },
       { value: "no", label: "미가입" },
     ], defaultValue: "yes" },
     { id: "loanType", label: "대출 유형", type: "select", options: [
       { value: "general", label: "일반 전세대출 (LTV 80%)" },
+      { value: "policy627", label: "6.27 대책 적용 (수도권 6억한도)" },
       { value: "hf", label: "주금공 버팀목 (LTV 80%)" },
       { value: "youth", label: "청년 전세대출 (LTV 100%)" },
     ], defaultValue: "general" },
+    { id: "loanTerm", label: "대출 만기", type: "select", options: [
+      { value: "20", label: "20년" },
+      { value: "25", label: "25년" },
+      { value: "30", label: "30년 (6.27 대책 최대)" },
+    ], defaultValue: "30" },
+    { id: "annualIncome", label: "연소득 (DSR 계산용)", type: "number", placeholder: "50000000", suffix: "원", defaultValue: 50000000 },
   ],
   calculate: (inputs) => {
     const jeonsePrice = Number(inputs.jeonsePrice) || 0
     const deposit = Number(inputs.deposit) || 0
     const rate = Number(inputs.rate) || 0
+    const region = inputs.region as string
+    const isFirstHome = inputs.isFirstHome === "yes"
     const hasGuarantee = inputs.hasGuarantee === "yes"
     const loanType = inputs.loanType as string
+    const loanTerm = Number(inputs.loanTerm) || 30
+    const annualIncome = Number(inputs.annualIncome) || 0
+
+    // 2025년 대출 규제 적용
+    // 6.27 대책: 주담대 한도 6억, 생애최초 LTV 70%, 만기 30년
+    // 10.15 대책: 스트레스DSR 수도권 3%, 서울+경기 12곳 규제지역
 
     // LTV 한도 설정
-    let ltvLimit = 0.8 // 80%
+    let ltvLimit = 0.8 // 기본 80%
     if (loanType === "youth") ltvLimit = 1.0 // 청년 100%
+    if (isFirstHome) ltvLimit = 0.7 // 생애최초 70% (6.27 대책)
+
+    // 지역별 대출 한도 (6.27 대책)
+    let maxLoanCap = Infinity
+    let stressDSR = 0
+
+    if (loanType === "policy627" || region === "seoul" || region === "regulated12" || region === "metropolitan") {
+      maxLoanCap = 600000000 // 수도권 6억 한도 (6.27 대책)
+    }
+
+    // 10.15 대책: 스트레스 DSR (수도권 3%)
+    if (region === "seoul" || region === "regulated12" || region === "metropolitan") {
+      stressDSR = 0.03 // 3%
+    }
+
+    // 규제지역 추가 규제 (서울 + 경기 12곳)
+    let isRegulatedArea = false
+    if (region === "seoul" || region === "regulated12") {
+      isRegulatedArea = true
+    }
 
     // 대출 가능 금액 계산
     const maxLoanByLTV = jeonsePrice * ltvLimit
     const neededLoan = jeonsePrice - deposit
-    const actualLoan = Math.min(neededLoan, maxLoanByLTV)
+    let actualLoan = Math.min(neededLoan, maxLoanByLTV, maxLoanCap)
+
+    // DSR 한도 계산 (스트레스 DSR 적용)
+    // DSR = 연간 원리금 상환액 / 연소득 * 100
+    // 스트레스 DSR은 금리에 스트레스 금리를 더해서 계산
+    const stressRate = rate + (stressDSR * 100)
+    const monthlyRate = stressRate / 100 / 12
+    const totalPayments = loanTerm * 12
+
+    // 원리금균등 상환 기준 월 상환액 계산
+    const calculateMonthlyPayment = (principal: number, monthlyR: number, payments: number) => {
+      if (monthlyR === 0) return principal / payments
+      return principal * (monthlyR * Math.pow(1 + monthlyR, payments)) / (Math.pow(1 + monthlyR, payments) - 1)
+    }
+
+    // DSR 40% 한도 계산
+    const maxAnnualPayment = annualIncome * 0.4
+    const maxMonthlyPayment = maxAnnualPayment / 12
+
+    // DSR 한도로 대출 가능 금액 역산
+    const maxLoanByDSR = annualIncome > 0 
+      ? maxMonthlyPayment * (Math.pow(1 + monthlyRate, totalPayments) - 1) / (monthlyRate * Math.pow(1 + monthlyRate, totalPayments))
+      : Infinity
+
+    actualLoan = Math.min(actualLoan, maxLoanByDSR)
 
     // 대출 한도 초과 여부
-    const isOverLimit = neededLoan > maxLoanByLTV
+    const isOverLimit = neededLoan > actualLoan
+    const shortfall = Math.max(0, jeonsePrice - deposit - actualLoan)
 
     // 월 이자 계산 (전세대출은 보통 이자만 납부)
     const monthlyInterest = actualLoan * (rate / 100) / 12
     const annualInterest = actualLoan * (rate / 100)
 
+    // 원리금균등 상환시 월 납입액
+    const monthlyPayment = calculateMonthlyPayment(actualLoan, rate / 100 / 12, totalPayments)
+
     // 전세보증보험료 계산 (연 0.128% 기준)
     const guaranteeFee = hasGuarantee ? jeonsePrice * 0.00128 : 0
 
-    // 실제 필요 자금
-    const actualNeeded = deposit + guaranteeFee
-    const shortfall = jeonsePrice - deposit - actualLoan
+    // 적용된 한도 제한 요인
+    let limitingFactor = "LTV 한도"
+    if (actualLoan === maxLoanCap) limitingFactor = "6.27 대책 6억 한도"
+    if (actualLoan === maxLoanByDSR && maxLoanByDSR < maxLoanCap) limitingFactor = "DSR 40% 한도"
 
     const loanTypeNames: Record<string, string> = {
       general: "일반 전세대출",
+      policy627: "6.27 대책 적용",
       hf: "주금공 버팀목",
       youth: "청년 전세대출",
     }
+
+    const regionNames: Record<string, string> = {
+      seoul: "서울 (규제지역)",
+      regulated12: "경기 규제 12곳",
+      metropolitan: "수도권",
+      other: "지방 (비수도권)",
+    }
+
+    return {
+      mainValue: formatCurrency(actualLoan),
+      mainLabel: "대출 가능 금액",
+      details: [
+        { label: "전세금", value: formatCurrency(jeonsePrice) },
+        { label: "보유 자금", value: formatCurrency(deposit) },
+        { label: "대출 유형", value: loanTypeNames[loanType] },
+        { label: "지역", value: `${regionNames[region]}${isRegulatedArea ? " ⚠️" : ""}` },
+        { label: "LTV", value: `${(ltvLimit * 100).toFixed(0)}%${isFirstHome ? " (생애최초)" : ""}` },
+        { label: "대출 한도 제한", value: limitingFactor },
+        { label: "스트레스 DSR", value: stressDSR > 0 ? `+${(stressDSR * 100).toFixed(0)}% 적용` : "미적용" },
+        { label: "월 이자 (이자만 납부)", value: formatCurrency(monthlyInterest) },
+        { label: "월 납입액 (원리금균등)", value: formatCurrency(monthlyPayment) },
+        { label: "연간 이자", value: formatCurrency(annualInterest) },
+        { label: "대출 만기", value: `${loanTerm}년` },
+        { label: "전세보증보험료", value: hasGuarantee ? formatCurrency(guaranteeFee) : "미가입" },
+        { label: "대출금리", value: formatPercent(rate) },
+        ...(isOverLimit ? [{ label: "⚠️ 주의", value: `자금 ${formatCurrency(shortfall)} 부족` }] : []),
+        ...(isRegulatedArea ? [{ label: "📋 규제지역 안내", value: "10.15 대책 적용 지역" }] : []),
+      ],
+    }
+  },
+}
 
     return {
       mainValue: formatCurrency(actualLoan),
@@ -1514,7 +1620,7 @@ const salaryCalculator: CalculatorConfig = {
         { label: "고용보험 (0.9%)", value: formatCurrency(employment) },
         { label: "소득세", value: formatCurrency(monthlyIncomeTax) },
         { label: "지방소득세", value: formatCurrency(localTax) },
-        { label: "총 공제액", value: formatCurrency(totalDeduction) },
+        { label: "총 공��액", value: formatCurrency(totalDeduction) },
         { label: "연간 실수령액", value: formatCurrency(netSalary * 12) },
       ],
     }
@@ -2172,7 +2278,7 @@ const fuelEfficiencyCalculator: CalculatorConfig = {
   description: "연비를 계산하고 연료비용을 추정합니다. 연료종류별 단가 적용.",
   category: "automotive",
   iconName: "Car",
-  legalBasis: "2024년 평균 연료 가격 기준",
+  legalBasis: "2024년 평균 연료 ��격 기준",
   inputs: [
     { id: "fuelType", label: "연료 종류", type: "select", options: [
       { value: "gasoline", label: "휘발유" },

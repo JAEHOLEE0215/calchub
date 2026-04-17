@@ -2,15 +2,16 @@
 
 import { motion, useScroll, useMotionValueEvent } from "framer-motion"
 import { useState } from "react"
+import Link from "next/link"
 import { Calculator, Menu, X, Search, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 const navLinks = [
-  { name: "금융", href: "#" },
-  { name: "건강", href: "#" },
-  { name: "부동산", href: "#" },
-  { name: "비즈니스", href: "#" },
-  { name: "학업", href: "#" },
+  { name: "금융", href: "/categories/financial" },
+  { name: "건강", href: "/categories/health" },
+  { name: "부동산", href: "/categories/realestate" },
+  { name: "비즈니스", href: "/categories/business" },
+  { name: "학업", href: "/categories/education" },
 ]
 
 export function Navbar() {
@@ -37,34 +38,35 @@ export function Navbar() {
         <div className="max-w-7xl mx-auto px-4">
           <nav className="flex items-center justify-between h-16 md:h-20">
             {/* Logo */}
-            <motion.a
-              href="#"
-              className="flex items-center gap-2"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
-                <Calculator className="w-5 h-5 text-primary-foreground" />
-              </div>
-              <div className="hidden sm:block">
-                <span className="text-xl font-black text-foreground">CalcHub</span>
-                <span className="text-xs block text-muted-foreground -mt-1">칼크허브</span>
-              </div>
-            </motion.a>
+            <Link href="/">
+              <motion.div
+                className="flex items-center gap-2"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
+                  <Calculator className="w-5 h-5 text-primary-foreground" />
+                </div>
+                <div className="hidden sm:block">
+                  <span className="text-xl font-black text-foreground">CalcHub</span>
+                  <span className="text-xs block text-muted-foreground -mt-1">칼크허브</span>
+                </div>
+              </motion.div>
+            </Link>
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center gap-1">
               {navLinks.map((link, index) => (
-                <motion.a
-                  key={link.name}
-                  href={link.href}
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-secondary"
-                >
-                  {link.name}
-                </motion.a>
+                <Link key={link.name} href={link.href}>
+                  <motion.span
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-secondary inline-block"
+                  >
+                    {link.name}
+                  </motion.span>
+                </Link>
               ))}
               <motion.button
                 initial={{ opacity: 0, y: -20 }}
@@ -119,20 +121,19 @@ export function Navbar() {
       >
         <div className="px-4 py-4 space-y-2">
           {navLinks.map((link, index) => (
-            <motion.a
-              key={link.name}
-              href={link.href}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ 
-                opacity: isMobileMenuOpen ? 1 : 0, 
-                x: isMobileMenuOpen ? 0 : -20 
-              }}
-              transition={{ delay: index * 0.05 }}
-              className="block px-4 py-3 text-lg font-medium text-foreground hover:bg-secondary rounded-xl transition-colors"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              {link.name}
-            </motion.a>
+            <Link key={link.name} href={link.href} onClick={() => setIsMobileMenuOpen(false)}>
+              <motion.span
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ 
+                  opacity: isMobileMenuOpen ? 1 : 0, 
+                  x: isMobileMenuOpen ? 0 : -20 
+                }}
+                transition={{ delay: index * 0.05 }}
+                className="block px-4 py-3 text-lg font-medium text-foreground hover:bg-secondary rounded-xl transition-colors"
+              >
+                {link.name}
+              </motion.span>
+            </Link>
           ))}
           <Button className="w-full mt-4 rounded-xl" size="lg">
             시작하기

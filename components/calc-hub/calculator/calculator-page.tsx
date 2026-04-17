@@ -140,7 +140,7 @@ export function CalculatorPage({ slug }: CalculatorPageProps) {
               </BreadcrumbSeparator>
               <BreadcrumbItem>
                 <BreadcrumbLink asChild>
-                  <Link href="/#categories" className="hover:text-primary transition-colors">
+                  <Link href={`/categories/${config.category}`} className="hover:text-primary transition-colors">
                     {categoryData.name} 계산기
                   </Link>
                 </BreadcrumbLink>

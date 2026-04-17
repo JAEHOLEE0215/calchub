@@ -33,6 +33,12 @@ jobs:
       - name: Build
         run: pnpm run build
 
+      - name: Create Cloudflare Pages project (if not exists)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: 41d4a5b1174bae34262ffc8a78f5d46d
+        run: npx wrangler pages project create calchub --production-branch=main || true
+
       - name: Deploy to Cloudflare Pages
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}

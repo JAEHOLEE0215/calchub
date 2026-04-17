@@ -1085,24 +1085,6 @@ const jeonseLoanCalculator: CalculatorConfig = {
   },
 }
 
-    return {
-      mainValue: formatCurrency(actualLoan),
-      mainLabel: "대출 ���능 금액",
-      details: [
-        { label: "전세금", value: formatCurrency(jeonsePrice) },
-        { label: "보유 자금", value: formatCurrency(deposit) },
-        { label: "대출 유형", value: loanTypeNames[loanType] },
-        { label: "LTV 한도", value: `${(ltvLimit * 100).toFixed(0)}% (${formatCurrency(maxLoanByLTV)})` },
-        { label: "월 이자", value: formatCurrency(monthlyInterest) },
-        { label: "연간 이자", value: formatCurrency(annualInterest) },
-        { label: "전세보증보험료", value: hasGuarantee ? formatCurrency(guaranteeFee) : "미가입" },
-        { label: "대출금리", value: formatPercent(rate) },
-        ...(isOverLimit ? [{ label: "주의", value: `자금 ${formatCurrency(shortfall)} 부족` }] : []),
-      ],
-    }
-  },
-}
-
 // 10. 취득세 계산기 - 2025년 10.15 대책 기준
 const acquisitionTaxCalculator: CalculatorConfig = {
   slug: "acquisition-tax",
@@ -1492,7 +1474,7 @@ const vatCalculator: CalculatorConfig = {
       mainValue: formatCurrency(vat),
       mainLabel: "부가가치세",
       details: [
-        { label: "계산 방식", value: calculationType === "fromSupply" ? "공급가액 기준" : "공급대가 기준" },
+        { label: "계산 방식", value: calculationType === "fromSupply" ? "��급가액 기준" : "공급대가 기준" },
         { label: "공급가액", value: formatCurrency(supplyValue) },
         { label: "부가세 (10%)", value: formatCurrency(vat) },
         { label: "공급대가 (총액)", value: formatCurrency(total) },

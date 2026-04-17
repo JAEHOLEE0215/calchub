@@ -45,6 +45,7 @@ const categories = [
     icon: Wallet,
     title: "금융 계산기",
     titleKo: "Financial",
+    slug: "financial",
     description: "대출이자, 적금, 투자수익률, 환율 계산",
     count: 4,
     color: "from-blue-500 to-cyan-500",
@@ -55,6 +56,7 @@ const categories = [
     icon: Heart,
     title: "건강 계산기",
     titleKo: "Health",
+    slug: "health",
     description: "BMI, 칼로리, 기초대사량, 운동량 계산",
     count: 4,
     color: "from-rose-500 to-pink-500",
@@ -65,6 +67,7 @@ const categories = [
     icon: Home,
     title: "부동산 계산기",
     titleKo: "Real Estate",
+    slug: "realestate",
     description: "전세대출, 월세전환, 취득세, 중개수수료",
     count: 4,
     color: "from-emerald-500 to-teal-500",
@@ -75,6 +78,7 @@ const categories = [
     icon: Briefcase,
     title: "비즈니스 계산기",
     titleKo: "Business",
+    slug: "business",
     description: "부가세, 마진율, 급여계산, 퇴직금",
     count: 4,
     color: "from-amber-500 to-orange-500",
@@ -85,6 +89,7 @@ const categories = [
     icon: GraduationCap,
     title: "학업 계산기",
     titleKo: "Education",
+    slug: "education",
     description: "학점계산, 등급컷, 수능점수, 환산점수",
     count: 4,
     color: "from-violet-500 to-purple-500",
@@ -95,6 +100,7 @@ const categories = [
     icon: Car,
     title: "자동차 계산기",
     titleKo: "Automotive",
+    slug: "automotive",
     description: "자동차세, 연비계산, 보험료, 할부금",
     count: 4,
     color: "from-slate-500 to-gray-600",
@@ -118,7 +124,7 @@ const itemVariants = {
   visible: { 
     opacity: 1, 
     y: 0,
-    transition: { duration: 0.5, ease: "easeOut" }
+    transition: { duration: 0.5, ease: "easeOut" as const }
   }
 }
 
@@ -151,12 +157,12 @@ export function Categories() {
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
         >
           {categories.map((category, index) => (
-            <motion.div
-              key={index}
-              variants={itemVariants}
-              whileHover={{ y: -8, transition: { duration: 0.3 } }}
-              className="group relative bg-card rounded-3xl p-6 border border-border shadow-sm hover:shadow-xl hover:border-primary/30 transition-all duration-300 cursor-pointer overflow-hidden"
-            >
+            <Link key={index} href={`/categories/${category.slug}`}>
+              <motion.div
+                variants={itemVariants}
+                whileHover={{ y: -8, transition: { duration: 0.3 } }}
+                className="group relative bg-card rounded-3xl p-6 border border-border shadow-sm hover:shadow-xl hover:border-primary/30 transition-all duration-300 cursor-pointer overflow-hidden h-full"
+              >
               {/* Background gradient on hover */}
               <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               
@@ -201,7 +207,8 @@ export function Categories() {
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </div>
               </div>
-            </motion.div>
+              </motion.div>
+            </Link>
           ))}
         </motion.div>
       </div>

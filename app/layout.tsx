@@ -1,23 +1,10 @@
 import type { Metadata } from 'next'
-import { Geist, Geist_Mono, Noto_Sans_KR } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 
-const geistSans = Geist({ 
-  subsets: ["latin"],
-  variable: "--font-geist-sans"
-});
-
-const geistMono = Geist_Mono({ 
-  subsets: ["latin"],
-  variable: "--font-geist-mono"
-});
-
-const notoSansKr = Noto_Sans_KR({
-  subsets: ["latin"],
-  variable: "--font-noto-kr",
-  weight: ["400", "500", "700", "900"]
-});
+const geistSans = { variable: "--font-geist-sans" };
+const geistMono = { variable: "--font-geist-mono" };
+const notoSansKr = { variable: "--font-noto-kr" };
 
 export const metadata: Metadata = {
   title: 'CalcHub 칼크허브 | 대한민국 No.1 계산기 포털',
@@ -26,18 +13,9 @@ export const metadata: Metadata = {
   keywords: ['계산기', '금융계산기', '대출이자계산기', 'BMI계산기', '연봉계산기', 'CalcHub', '칼크허브'],
   icons: {
     icon: [
-      {
-        url: '/icon-light-32x32.png',
-        media: '(prefers-color-scheme: light)',
-      },
-      {
-        url: '/icon-dark-32x32.png',
-        media: '(prefers-color-scheme: dark)',
-      },
-      {
-        url: '/icon.svg',
-        type: 'image/svg+xml',
-      },
+      { url: '/icon-light-32x32.png', media: '(prefers-color-scheme: light)' },
+      { url: '/icon-dark-32x32.png', media: '(prefers-color-scheme: dark)' },
+      { url: '/icon.svg', type: 'image/svg+xml' },
     ],
     apple: '/apple-icon.png',
   },
@@ -45,9 +23,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="ko" className="dark bg-background">
       <body className={`${geistSans.variable} ${geistMono.variable} ${notoSansKr.variable} font-sans antialiased`}>

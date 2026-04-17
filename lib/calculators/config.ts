@@ -724,7 +724,7 @@ const annuityCalculator: CalculatorConfig = {
       // A값: 전체 가입자 평균소득월액 (약 298만원)
       // B값: 본인 평균소득월액
       const aValue = 2989352
-      const bValue = Math.min(avgIncome, 5900000) // 상한액 �����용
+      const bValue = Math.min(avgIncome, 5900000) // 상한액 �������용
 
       // 소득대체율: 2024년 기준 약 40% (20년 가입 기준)
       // 가입년수 1년 추가당 약 0.5%p 증가
@@ -1326,14 +1326,14 @@ const realtorFeeCalculator: CalculatorConfig = {
   },
 }
 
-// 12. 월세전환 계산기 - 전월세전환율 5.5%
+// 12. 월세전환 계산기 - 전월세전환율 4.75% (기준금리 2.75% + 2%)
 const monthlyRentCalculator: CalculatorConfig = {
   slug: "monthly-rent",
   name: "월세전환 계산기",
   description: "보증금과 월세 간 전환을 계산합니다. 전월세전환율 적용.",
   category: "realestate",
   iconName: "Home",
-  legalBasis: "2024년 기준금리 + 2% = 전월세전환율",
+  legalBasis: "2025년 기준금리 2.75% + 2% = 전월세전환율 4.75%",
   inputs: [
     { id: "conversionType", label: "전환 방향", type: "radio", options: [
       { value: "toMonthly", label: "보증금 → 월세" },
@@ -1342,14 +1342,14 @@ const monthlyRentCalculator: CalculatorConfig = {
     { id: "currentDeposit", label: "현재 보증금", type: "number", placeholder: "200000000", suffix: "원", defaultValue: 200000000 },
     { id: "targetDeposit", label: "희망 보증금", type: "number", placeholder: "100000000", suffix: "원", defaultValue: 100000000 },
     { id: "currentMonthly", label: "현재 월세", type: "number", placeholder: "500000", suffix: "원", defaultValue: 500000 },
-    { id: "conversionRate", label: "전월세전환율", type: "number", placeholder: "5.5", suffix: "%", defaultValue: 5.5, step: 0.1 },
+    { id: "conversionRate", label: "전월세전환율", type: "number", placeholder: "4.75", suffix: "%", defaultValue: 4.75, step: 0.1 },
   ],
   calculate: (inputs) => {
     const conversionType = inputs.conversionType as string
     const currentDeposit = Number(inputs.currentDeposit) || 0
     const targetDeposit = Number(inputs.targetDeposit) || 0
     const currentMonthly = Number(inputs.currentMonthly) || 0
-    const conversionRate = Number(inputs.conversionRate) || 5.5
+    const conversionRate = Number(inputs.conversionRate) || 4.75
 
     // 전월세전환율 (연 기준)
     const annualRate = conversionRate / 100
@@ -1396,7 +1396,7 @@ const monthlyRentCalculator: CalculatorConfig = {
         { label: "전환 후 월세", value: formatCurrency(resultMonthly) },
         { label: "현재 연간 주거비", value: formatCurrency(currentAnnualCost) },
         { label: "전환 후 연간 주거비", value: formatCurrency(newAnnualCost) },
-        { label: "참고", value: "법정 상한: 기준금리 + 2%" },
+        { label: "참고", value: "법정 상한: 기준금리(2.75%) + 2% = 4.75%" },
       ],
     }
   },
@@ -2215,7 +2215,7 @@ const carTaxCalculator: CalculatorConfig = {
   description: "자동차세를 계산합니다. 2024년 cc당 요율 및 차령감면 적용.",
   category: "automotive",
   iconName: "Car",
-  legalBasis: "2024년 지방세법",
+  legalBasis: "2024년 지���세법",
   inputs: [
     { id: "displacement", label: "배기량", type: "number", placeholder: "2000", suffix: "cc", defaultValue: 2000, min: 0, max: 10000 },
     { id: "carAge", label: "차량 연식 (연수)", type: "number", placeholder: "3", suffix: "년", defaultValue: 3, min: 0, max: 30 },

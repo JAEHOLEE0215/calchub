@@ -2,17 +2,18 @@
 
 import { motion, useMotionValue, useTransform, animate } from "framer-motion"
 import { useEffect, useState, useRef } from "react"
+import Link from "next/link"
 import { TrendingUp, Users, Zap, Star } from "lucide-react"
 
 const popularCalculators = [
-  { name: "대출이자 계산기", users: 458293, category: "금융", trend: "+12%" },
-  { name: "BMI 계산기", users: 392847, category: "건강", trend: "+8%" },
-  { name: "연봉 실수령액 계산기", users: 347291, category: "비즈니스", trend: "+23%" },
-  { name: "전세대출 계산기", users: 298472, category: "부동산", trend: "+15%" },
-  { name: "학점 계산기", users: 267839, category: "학업", trend: "+5%" },
-  { name: "적금이자 계산기", users: 234567, category: "금융", trend: "+11%" },
-  { name: "칼로리 계산기", users: 198234, category: "건강", trend: "+19%" },
-  { name: "자동차세 계산기", users: 176543, category: "자동차", trend: "+7%" },
+  { name: "대출이자 계산기", users: 458293, category: "금융", trend: "+12%", slug: "loan-interest" },
+  { name: "BMI 계산기", users: 392847, category: "건강", trend: "+8%", slug: "bmi" },
+  { name: "연봉 실수령액 계산기", users: 347291, category: "비즈니스", trend: "+23%", slug: "salary" },
+  { name: "전세대출 계산기", users: 298472, category: "부동산", trend: "+15%", slug: "jeonse-loan" },
+  { name: "학점 계산기", users: 267839, category: "학업", trend: "+5%", slug: "gpa" },
+  { name: "적금이자 계산기", users: 234567, category: "금융", trend: "+11%", slug: "savings-interest" },
+  { name: "칼로리 계산기", users: 198234, category: "건강", trend: "+19%", slug: "calorie" },
+  { name: "자동차세 계산기", users: 176543, category: "자동차", trend: "+7%", slug: "car-tax" },
 ]
 
 function AnimatedCounter({ value }: { value: number }) {
@@ -118,14 +119,16 @@ export function Popular() {
                 </div>
 
                 {/* Quick action */}
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="w-full mt-4 py-3 rounded-xl bg-primary/10 text-primary font-medium text-sm hover:bg-primary/20 transition-colors flex items-center justify-center gap-2"
-                >
-                  <Zap className="w-4 h-4" />
-                  바로 계산하기
-                </motion.button>
+                <Link href={`/calculators/${calc.slug}`}>
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="w-full mt-4 py-3 rounded-xl bg-primary/10 text-primary font-medium text-sm hover:bg-primary/20 transition-colors flex items-center justify-center gap-2"
+                  >
+                    <Zap className="w-4 h-4" />
+                    바로 계산하기
+                  </motion.button>
+                </Link>
               </motion.div>
             ))}
           </motion.div>

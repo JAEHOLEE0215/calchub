@@ -493,14 +493,14 @@ const bodyFatCalculator: CalculatorConfig = {
 // FINANCIAL CALCULATORS (금융)
 // ============================================
 
-// 5. 대출이자 계산기 - 원리금균등/원금균등/만기일시
+// 5. 대출이자 계산기 - 원리금균등/원금균등/만기일시 + DSR 40% 한도
 const loanInterestCalculator: CalculatorConfig = {
   slug: "loan-interest",
   name: "대출이자 계산기",
-  description: "대출금액, 금리, 기간으로 월 상환액과 총 이자를 계산합니다.",
+  description: "대출금액, 금리, 기간으로 월 상환액과 총 이자를 계산합니다. DSR 40% 한도 계산 포함.",
   category: "financial",
   iconName: "Wallet",
-  legalBasis: "2024년 금융감독원 기준",
+  legalBasis: "2025년 금융감독원 기준, DSR 40% 규제",
   inputs: [
     { id: "principal", label: "대출금액", type: "number", placeholder: "100000000", suffix: "원", defaultValue: 100000000 },
     { id: "rate", label: "연이율", type: "number", placeholder: "4.5", suffix: "%", defaultValue: 4.5, step: 0.1 },
@@ -510,12 +510,14 @@ const loanInterestCalculator: CalculatorConfig = {
       { value: "equal_principal", label: "원금균등상환" },
       { value: "bullet", label: "만기일시상환" },
     ], defaultValue: "equal_principal_interest" },
+    { id: "annualIncome", label: "연소득 (DSR 계산용, 선택)", type: "number", placeholder: "50000000", suffix: "원", defaultValue: 0 },
   ],
   calculate: (inputs) => {
     const principal = Number(inputs.principal) || 0
     const annualRate = (Number(inputs.rate) || 0) / 100
     const months = Number(inputs.months) || 1
     const method = inputs.method as string
+    const annualIncome = Number(inputs.annualIncome) || 0
     const monthlyRate = annualRate / 12
 
     let monthlyPayment = 0
@@ -563,6 +565,20 @@ const loanInterestCalculator: CalculatorConfig = {
       }
     }
 
+    // DSR 40% 한도 계산
+    // DSR = (연간 원리금 상환액 / 연소득) * 100
+    // DSR 40% 한도 = 연소득 * 40% / 12 = 월 최대 원리금
+    const dsrLimit = annualIncome > 0 ? (annualIncome * 0.4) / 12 : 0
+    const annualRepayment = monthlyPayment * 12
+    const currentDSR = annualIncome > 0 ? (annualRepayment / annualIncome) * 100 : 0
+    const isDSRExceeded = annualIncome > 0 && monthlyPayment > dsrLimit
+
+    // DSR 기준 최대 대출 가능 금액 계산 (원리금균등 기준)
+    let maxLoanByDSR = 0
+    if (annualIncome > 0 && monthlyRate > 0) {
+      maxLoanByDSR = dsrLimit * (Math.pow(1 + monthlyRate, months) - 1) / (monthlyRate * Math.pow(1 + monthlyRate, months))
+    }
+
     const methodNames: Record<string, string> = {
       equal_principal_interest: "원리금균등",
       equal_principal: "원금균등",
@@ -578,8 +594,19 @@ const loanInterestCalculator: CalculatorConfig = {
       { label: "대출기간", value: `${months}개월 (${(months/12).toFixed(1)}년)` },
     ]
 
+    // DSR 정보 추가 (연소득 입력 시)
+    if (annualIncome > 0) {
+      details.push({ label: "--- DSR 분석 ---", value: "" })
+      details.push({ label: "연소득", value: formatCurrency(annualIncome) })
+      details.push({ label: "DSR 40% 월 한도", value: formatCurrency(dsrLimit) })
+      details.push({ label: "현재 DSR", value: `${currentDSR.toFixed(1)}%` })
+      details.push({ label: "DSR 한도 초과", value: isDSRExceeded ? "초과 (대출 불가)" : "정상" })
+      details.push({ label: "DSR 기준 최대 대출", value: formatCurrency(maxLoanByDSR) })
+    }
+
     // 상환표 추가
-    schedule.forEach((s, idx) => {
+    details.push({ label: "--- 상환표 ---", value: "" })
+    schedule.forEach((s) => {
       details.push({
         label: `${s.month}회차 상환`,
         value: `원금 ${formatCurrency(s.principal)} + 이자 ${formatCurrency(s.interest)}`
@@ -724,7 +751,7 @@ const annuityCalculator: CalculatorConfig = {
       // A값: 전체 가입자 평균소득월액 (약 298만원)
       // B값: 본인 평균소득월액
       const aValue = 2989352
-      const bValue = Math.min(avgIncome, 5900000) // 상한액 �������용
+      const bValue = Math.min(avgIncome, 5900000) // 상한액 ���������용
 
       // 소득대체율: 2024년 기준 약 40% (20년 가입 기준)
       // 가입년수 1년 추가당 약 0.5%p 증가
@@ -1060,7 +1087,7 @@ const jeonseLoanCalculator: CalculatorConfig = {
 
     return {
       mainValue: formatCurrency(actualLoan),
-      mainLabel: "대출 가능 금액",
+      mainLabel: "대출 ���능 금액",
       details: [
         { label: "전세금", value: formatCurrency(jeonsePrice) },
         { label: "보유 자금", value: formatCurrency(deposit) },
@@ -1410,7 +1437,7 @@ const monthlyRentCalculator: CalculatorConfig = {
 const vatCalculator: CalculatorConfig = {
   slug: "vat",
   name: "부가세 계산기",
-  description: "부가가치세를 계산합니다. 공급가액↔공급대가 양방향 계산.",
+  description: "부가가치세를 계산합니다. 공급가액↔��급대가 양방향 계산.",
   category: "business",
   iconName: "Briefcase",
   legalBasis: "2024년 부가가치세법",

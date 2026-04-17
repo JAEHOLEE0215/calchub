@@ -724,7 +724,7 @@ const annuityCalculator: CalculatorConfig = {
       // A값: 전체 가입자 평균소득월액 (약 298만원)
       // B값: 본인 평균소득월액
       const aValue = 2989352
-      const bValue = Math.min(avgIncome, 5900000) // 상한액 ���용
+      const bValue = Math.min(avgIncome, 5900000) // 상한액 �����용
 
       // 소득대체율: 2024년 기준 약 40% (20년 가입 기준)
       // 가입년수 1년 추가당 약 0.5%p 증가
@@ -1076,14 +1076,14 @@ const jeonseLoanCalculator: CalculatorConfig = {
   },
 }
 
-// 10. 취득세 계산기 - 2024 기준
+// 10. 취득세 계산기 - 2025년 10.15 대책 기준
 const acquisitionTaxCalculator: CalculatorConfig = {
   slug: "acquisition-tax",
   name: "취득세 계산기",
-  description: "부동산 취득세를 계산합니다. 2024년 세법 기준, 주택수 및 지역 반영.",
+  description: "부동산 취득세를 계산합니다. 2025년 10.15 대책 규제지역 반영.",
   category: "realestate",
   iconName: "Home",
-  legalBasis: "2024년 지방세법 기준",
+  legalBasis: "2025년 10.15 대책, 지방세법 기준",
   inputs: [
     { id: "price", label: "취득가액 (매매가)", type: "number", placeholder: "500000000", suffix: "원", defaultValue: 500000000 },
     { id: "houseCount", label: "취득 후 주택 수", type: "select", options: [
@@ -1091,10 +1091,12 @@ const acquisitionTaxCalculator: CalculatorConfig = {
       { value: "2", label: "2주택" },
       { value: "3", label: "3주택 이상" },
     ], defaultValue: "1" },
-    { id: "isRegulated", label: "조정대상지역 여부", type: "radio", options: [
-      { value: "yes", label: "조정대상지역" },
-      { value: "no", label: "비조정지역" },
-    ], defaultValue: "no" },
+    { id: "region", label: "지역 선택 (10.15 대책)", type: "select", options: [
+      { value: "seoul", label: "서울 전역 (25개구 규제지역)" },
+      { value: "gyeonggi12", label: "경기 규제 12곳 (과천, 성남분당 등)" },
+      { value: "other_metro", label: "기타 수도권 (비규제)" },
+      { value: "local", label: "지방 (비규제)" },
+    ], defaultValue: "seoul" },
     { id: "propertyType", label: "부동산 유형", type: "select", options: [
       { value: "house", label: "주택" },
       { value: "land", label: "토지" },
@@ -1104,21 +1106,33 @@ const acquisitionTaxCalculator: CalculatorConfig = {
   calculate: (inputs) => {
     const price = Number(inputs.price) || 0
     const houseCount = inputs.houseCount as string
-    const isRegulated = inputs.isRegulated === "yes"
+    const region = inputs.region as string
     const propertyType = inputs.propertyType as string
+
+    // 2025년 10.15 대책 규제지역 판정
+    // 서울 전역 25개구 + 경기 12곳 (과천, 성남분당, 하남, 광명, 구리, 남양주, 안양만안, 의왕, 수원팔달, 용인수지, 용인기흥, 고양덕양)
+    const isRegulated = region === "seoul" || region === "gyeonggi12"
 
     let acquisitionTaxRate = 0
     let taxDescription = ""
+    let regulationNote = ""
+
+    // 규제지역 목록
+    const regulatedAreas = isRegulated 
+      ? (region === "seoul" 
+        ? "서울 25개구 전역" 
+        : "과천, 성남분당, 하남, 광명, 구리, 남양주, 안양만안, 의왕, 수원팔달, 용인수지, 용인기흥, 고양덕양")
+      : "비규제지역"
 
     if (propertyType === "house") {
-      // 주택 취득세율 (2024년 기준)
+      // 주택 취득세율 (2025년 10.15 대책 기준)
       if (houseCount === "1") {
         // 1주택: 6억 이하 1%, 6-9억 1-3%, 9억 초과 3%
         if (price <= 600000000) {
           acquisitionTaxRate = 0.01
           taxDescription = "1주택 6억 이하: 1%"
         } else if (price <= 900000000) {
-          // 6억~9억: 누진세율 (6억 1% → 9억 3%)
+          // 6억~9억: 누진세율 (6억 1% -> 9억 3%)
           acquisitionTaxRate = 0.01 + ((price - 600000000) / 300000000) * 0.02
           taxDescription = "1주택 6-9억: 누진 1~3%"
         } else {
@@ -1126,10 +1140,11 @@ const acquisitionTaxCalculator: CalculatorConfig = {
           taxDescription = "1주택 9억 초과: 3%"
         }
       } else if (houseCount === "2") {
-        // 2주택
+        // 2주택 - 10.15 대책 적용
         if (isRegulated) {
           acquisitionTaxRate = 0.08 // 조정지역 8%
           taxDescription = "2주택 조정지역: 8%"
+          regulationNote = "10.15 대책 규제지역 중과"
         } else {
           // 비조정지역: 1-3%
           if (price <= 600000000) acquisitionTaxRate = 0.01
@@ -1138,13 +1153,14 @@ const acquisitionTaxCalculator: CalculatorConfig = {
           taxDescription = "2주택 비조정: 1-3%"
         }
       } else {
-        // 3주택 이상
+        // 3주택 이상 - 10.15 대책 적용
         if (isRegulated) {
           acquisitionTaxRate = 0.12 // 조정지역 12%
-          taxDescription = "3주택 이상 조정지역: 12%"
+          taxDescription = "3주택+ 조정지역: 12%"
+          regulationNote = "10.15 대책 규제지역 중과"
         } else {
           acquisitionTaxRate = 0.08 // 비조정지역 8%
-          taxDescription = "3주택 이상 비조정: 8%"
+          taxDescription = "3주택+ 비조정: 8%"
         }
       }
     } else if (propertyType === "land") {
@@ -1168,18 +1184,32 @@ const acquisitionTaxCalculator: CalculatorConfig = {
 
     const totalTax = acquisitionTax + educationTax + ruralTax
 
+    // 실효세율 계산
+    const effectiveRate = (totalTax / price) * 100
+
+    const regionNames: Record<string, string> = {
+      seoul: "서울 (규제지역)",
+      gyeonggi12: "경기 규제 12곳",
+      other_metro: "기타 수도권",
+      local: "지방",
+    }
+
     return {
       mainValue: formatCurrency(totalTax),
       mainLabel: "총 취득세",
       details: [
         { label: "취득가액", value: formatCurrency(price) },
         { label: "적용 세율", value: taxDescription },
+        { label: "실효세율", value: `${effectiveRate.toFixed(2)}%` },
         { label: "취득세", value: formatCurrency(acquisitionTax) },
         { label: "지방교육세", value: formatCurrency(educationTax) },
         { label: "농어촌특별세", value: formatCurrency(ruralTax) },
         { label: "주택 수", value: `${houseCount}주택` },
-        { label: "지역", value: isRegulated ? "조정대상지역" : "비조정지역" },
-        { label: "법적 기준", value: "2024년 지방세법" },
+        { label: "지역", value: regionNames[region] },
+        { label: "규제지역 여부", value: isRegulated ? "규제지역 (10.15 대책)" : "비규제지역" },
+        ...(isRegulated ? [{ label: "규제지역 목록", value: regulatedAreas }] : []),
+        ...(regulationNote ? [{ label: "적용 규제", value: regulationNote }] : []),
+        { label: "법적 기준", value: "2025년 10.15 대책" },
       ],
     }
   },
@@ -1679,7 +1709,7 @@ const severanceCalculator: CalculatorConfig = {
     // 과세표준 = (환산급여 - 환산급여공제) / 12 × 근속년수
     const taxBase = (convertedIncome - incomeDeduction) / 12 * totalYears
 
-    // 세율 적용 (2024년 퇴직소득세율)
+    // 세율 적용 (2024년 퇴직���득세율)
     let tax = 0
     if (taxBase <= 14000000) {
       tax = taxBase * 0.06
@@ -2224,7 +2254,7 @@ const carTaxCalculator: CalculatorConfig = {
       }
       baseTax = displacement * taxRate
     } else {
-      // 승합/화물차: 영업용/비영업용, 톤수별 차등
+      // 승합/화물차: 영업용/비영업용, 톤���별 차등
       // 간소화: cc 기준 적용
       taxRate = 65
       baseTax = Math.max(displacement * 65, 65000)

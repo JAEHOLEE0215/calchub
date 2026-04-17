@@ -1,6 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
+import Link from "next/link"
 import { 
   Wallet, 
   Heart, 
@@ -11,13 +12,41 @@ import {
   ArrowRight
 } from "lucide-react"
 
+// Calculator name to slug mapping
+const calculatorSlugs: Record<string, string> = {
+  "대출이자": "loan-interest",
+  "적금이자": "savings-interest",
+  "연금계산": "annuity",
+  "환율변환": "exchange-rate",
+  "BMI지수": "bmi",
+  "기초대사량": "bmr",
+  "칼로리계산": "calorie",
+  "체지방률": "body-fat",
+  "전세대출": "jeonse-loan",
+  "취득세": "acquisition-tax",
+  "중개수수료": "realtor-fee",
+  "월세전환": "monthly-rent",
+  "부가세계산": "vat",
+  "마진계산": "margin",
+  "급여계산": "salary",
+  "퇴직금계산": "severance",
+  "학점계산": "gpa",
+  "등급컷계산": "grade-cut",
+  "수능점수": "suneung",
+  "환산점수": "score-convert",
+  "자동차세": "car-tax",
+  "연비계산": "fuel-efficiency",
+  "보험료": "car-insurance",
+  "할부금계산": "installment",
+}
+
 const categories = [
   {
     icon: Wallet,
     title: "금융 계산기",
     titleKo: "Financial",
     description: "대출이자, 적금, 투자수익률, 환율 계산",
-    count: 12,
+    count: 4,
     color: "from-blue-500 to-cyan-500",
     bgColor: "bg-blue-500/10",
     calculators: ["대출이자", "적금이자", "연금계산", "환율변환"]
@@ -27,7 +56,7 @@ const categories = [
     title: "건강 계산기",
     titleKo: "Health",
     description: "BMI, 칼로리, 기초대사량, 운동량 계산",
-    count: 8,
+    count: 4,
     color: "from-rose-500 to-pink-500",
     bgColor: "bg-rose-500/10",
     calculators: ["BMI지수", "기초대사량", "칼로리계산", "체지방률"]
@@ -37,7 +66,7 @@ const categories = [
     title: "부동산 계산기",
     titleKo: "Real Estate",
     description: "전세대출, 월세전환, 취득세, 중개수수료",
-    count: 10,
+    count: 4,
     color: "from-emerald-500 to-teal-500",
     bgColor: "bg-emerald-500/10",
     calculators: ["전세대출", "취득세", "중개수수료", "월세전환"]
@@ -47,7 +76,7 @@ const categories = [
     title: "비즈니스 계산기",
     titleKo: "Business",
     description: "부가세, 마진율, 급여계산, 퇴직금",
-    count: 9,
+    count: 4,
     color: "from-amber-500 to-orange-500",
     bgColor: "bg-amber-500/10",
     calculators: ["부가세계산", "마진계산", "급여계산", "퇴직금계산"]
@@ -57,7 +86,7 @@ const categories = [
     title: "학업 계산기",
     titleKo: "Education",
     description: "학점계산, 등급컷, 수능점수, 환산점수",
-    count: 6,
+    count: 4,
     color: "from-violet-500 to-purple-500",
     bgColor: "bg-violet-500/10",
     calculators: ["학점계산", "등급컷계산", "수능점수", "환산점수"]
@@ -67,7 +96,7 @@ const categories = [
     title: "자동차 계산기",
     titleKo: "Automotive",
     description: "자동차세, 연비계산, 보험료, 할부금",
-    count: 5,
+    count: 4,
     color: "from-slate-500 to-gray-600",
     bgColor: "bg-slate-500/10",
     calculators: ["자동차세", "연비계산", "보험료", "할부금계산"]
@@ -152,14 +181,18 @@ export function Categories() {
 
                 {/* Calculator tags */}
                 <div className="flex flex-wrap gap-2 mb-4">
-                  {category.calculators.map((calc, i) => (
-                    <span
-                      key={i}
-                      className="text-xs px-2 py-1 rounded-lg bg-secondary text-secondary-foreground"
-                    >
-                      {calc}
-                    </span>
-                  ))}
+                  {category.calculators.map((calc, i) => {
+                    const slug = calculatorSlugs[calc]
+                    return (
+                      <Link
+                        key={i}
+                        href={`/calculators/${slug}`}
+                        className="text-xs px-2 py-1 rounded-lg bg-secondary text-secondary-foreground hover:bg-primary/20 hover:text-primary transition-colors"
+                      >
+                        {calc}
+                      </Link>
+                    )
+                  })}
                 </div>
 
                 {/* Arrow */}

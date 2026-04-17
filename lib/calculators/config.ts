@@ -3,16 +3,6 @@
 // 24 calculators with Korean regulations
 // ============================================
 
-import { 
-  Wallet, 
-  Heart, 
-  Home, 
-  Briefcase, 
-  GraduationCap, 
-  Car,
-  type LucideIcon
-} from "lucide-react"
-
 // ============================================
 // Type Definitions
 // ============================================
@@ -47,23 +37,25 @@ export type CalculationFunction = (inputs: Record<string, string | number>) => C
 
 export type CategoryType = "financial" | "health" | "realestate" | "business" | "education" | "automotive"
 
+export type IconName = "Wallet" | "Heart" | "Home" | "Briefcase" | "GraduationCap" | "Car"
+
 export interface CalculatorConfig {
   slug: string
   name: string
   description: string
   category: CategoryType
-  icon: LucideIcon
+  iconName: IconName
   inputs: CalculatorInput[]
   calculate: CalculationFunction
 }
 
-export const categoryInfo: Record<CategoryType, { name: string; icon: LucideIcon; color: string }> = {
-  financial: { name: "금융", icon: Wallet, color: "from-blue-500 to-cyan-500" },
-  health: { name: "건강", icon: Heart, color: "from-rose-500 to-pink-500" },
-  realestate: { name: "부동산", icon: Home, color: "from-emerald-500 to-teal-500" },
-  business: { name: "비즈니스", icon: Briefcase, color: "from-amber-500 to-orange-500" },
-  education: { name: "학업", icon: GraduationCap, color: "from-violet-500 to-purple-500" },
-  automotive: { name: "자동차", icon: Car, color: "from-slate-500 to-gray-600" },
+export const categoryInfo: Record<CategoryType, { name: string; iconName: IconName; color: string }> = {
+  financial: { name: "금융", iconName: "Wallet", color: "from-blue-500 to-cyan-500" },
+  health: { name: "건강", iconName: "Heart", color: "from-rose-500 to-pink-500" },
+  realestate: { name: "부동산", iconName: "Home", color: "from-emerald-500 to-teal-500" },
+  business: { name: "비즈니스", iconName: "Briefcase", color: "from-amber-500 to-orange-500" },
+  education: { name: "학업", iconName: "GraduationCap", color: "from-violet-500 to-purple-500" },
+  automotive: { name: "자동차", iconName: "Car", color: "from-slate-500 to-gray-600" },
 }
 
 // ============================================
@@ -92,7 +84,7 @@ const loanInterestCalculator: CalculatorConfig = {
   name: "대출이자 계산기",
   description: "대출금액, 금리, 기간으로 월 상환액과 총 이자를 계산합니다.",
   category: "financial",
-  icon: Wallet,
+  iconName: "Wallet",
   inputs: [
     { id: "principal", label: "대출금액", type: "number", placeholder: "100000000", suffix: "원", defaultValue: 100000000 },
     { id: "rate", label: "연이율", type: "number", placeholder: "4.5", suffix: "%", defaultValue: 4.5, step: 0.1 },
@@ -153,7 +145,7 @@ const savingsInterestCalculator: CalculatorConfig = {
   name: "적금이자 계산기",
   description: "월 납입액과 이자율로 만기 시 수령액을 계산합니다.",
   category: "financial",
-  icon: Wallet,
+  iconName: "Wallet",
   inputs: [
     { id: "monthly", label: "월 납입액", type: "number", placeholder: "500000", suffix: "원", defaultValue: 500000 },
     { id: "rate", label: "연이율", type: "number", placeholder: "3.5", suffix: "%", defaultValue: 3.5, step: 0.1 },
@@ -201,7 +193,7 @@ const annuityCalculator: CalculatorConfig = {
   name: "연금 계산기",
   description: "국민연금 예상 수령액을 계산합니다.",
   category: "financial",
-  icon: Wallet,
+  iconName: "Wallet",
   inputs: [
     { id: "avgIncome", label: "평균 월소득", type: "number", placeholder: "3000000", suffix: "원", defaultValue: 3000000 },
     { id: "years", label: "가입기간", type: "number", placeholder: "30", suffix: "년", defaultValue: 30 },
@@ -258,7 +250,7 @@ const exchangeRateCalculator: CalculatorConfig = {
   name: "환율 계산기",
   description: "주요 통화 간 환율을 계산합니다.",
   category: "financial",
-  icon: Wallet,
+  iconName: "Wallet",
   inputs: [
     { id: "amount", label: "금액", type: "number", placeholder: "1000", defaultValue: 1000 },
     { id: "fromCurrency", label: "보유 통화", type: "select", options: [
@@ -317,7 +309,7 @@ const bmiCalculator: CalculatorConfig = {
   name: "BMI 계산기",
   description: "키와 몸무게로 체질량지수(BMI)를 계산합니다.",
   category: "health",
-  icon: Heart,
+  iconName: "Heart",
   inputs: [
     { id: "height", label: "키", type: "number", placeholder: "170", suffix: "cm", defaultValue: 170, min: 100, max: 250 },
     { id: "weight", label: "몸무게", type: "number", placeholder: "70", suffix: "kg", defaultValue: 70, min: 30, max: 300 },
@@ -370,7 +362,7 @@ const bmrCalculator: CalculatorConfig = {
   name: "기초대사량 계산기",
   description: "기초대사량(BMR)과 일일 권장 칼로리를 계산합니다.",
   category: "health",
-  icon: Heart,
+  iconName: "Heart",
   inputs: [
     { id: "gender", label: "성별", type: "radio", options: [
       { value: "male", label: "남성" },
@@ -432,7 +424,7 @@ const calorieCalculator: CalculatorConfig = {
   name: "칼로리 계산기",
   description: "운동별 소모 칼로리를 계산합니다.",
   category: "health",
-  icon: Heart,
+  iconName: "Heart",
   inputs: [
     { id: "weight", label: "체중", type: "number", placeholder: "70", suffix: "kg", defaultValue: 70 },
     { id: "exercise", label: "운동 종류", type: "select", options: [
@@ -500,7 +492,7 @@ const bodyFatCalculator: CalculatorConfig = {
   name: "체지방률 계산기",
   description: "체지방률을 계산하고 건강 상태를 분석합니다.",
   category: "health",
-  icon: Heart,
+  iconName: "Heart",
   inputs: [
     { id: "gender", label: "성별", type: "radio", options: [
       { value: "male", label: "남성" },
@@ -565,7 +557,7 @@ const jeonseLoanCalculator: CalculatorConfig = {
   name: "전세대출 계산기",
   description: "전세자금대출 한도와 월 이자를 계산합니다.",
   category: "realestate",
-  icon: Home,
+  iconName: "Home",
   inputs: [
     { id: "jeonsePrice", label: "전세금", type: "number", placeholder: "300000000", suffix: "원", defaultValue: 300000000 },
     { id: "deposit", label: "보유 자금", type: "number", placeholder: "50000000", suffix: "원", defaultValue: 50000000 },
@@ -619,7 +611,7 @@ const acquisitionTaxCalculator: CalculatorConfig = {
   name: "취득세 계산기",
   description: "부동산 취득세와 등록세를 계산합니다.",
   category: "realestate",
-  icon: Home,
+  iconName: "Home",
   inputs: [
     { id: "price", label: "취득가액", type: "number", placeholder: "500000000", suffix: "원", defaultValue: 500000000 },
     { id: "houseCount", label: "주택 수", type: "select", options: [
@@ -683,7 +675,7 @@ const realtorFeeCalculator: CalculatorConfig = {
   name: "부동산 중개수수료 계산기",
   description: "부동산 거래 시 중개수수료를 계산합니다.",
   category: "realestate",
-  icon: Home,
+  iconName: "Home",
   inputs: [
     { id: "transactionType", label: "거래 유형", type: "select", options: [
       { value: "sale", label: "매매" },
@@ -753,7 +745,7 @@ const monthlyRentCalculator: CalculatorConfig = {
   name: "월세 전환 계산기",
   description: "전세와 월세 간 전환금액을 계산합니다.",
   category: "realestate",
-  icon: Home,
+  iconName: "Home",
   inputs: [
     { id: "conversionType", label: "전환 방향", type: "select", options: [
       { value: "toMonthly", label: "전세 → 월세" },
@@ -811,7 +803,7 @@ const vatCalculator: CalculatorConfig = {
   name: "부가세 계산기",
   description: "부가가치세(VAT)를 계산합니다.",
   category: "business",
-  icon: Briefcase,
+  iconName: "Briefcase",
   inputs: [
     { id: "calculationType", label: "계산 방식", type: "select", options: [
       { value: "addVat", label: "공급가액 → 합계" },
@@ -863,7 +855,7 @@ const marginCalculator: CalculatorConfig = {
   name: "마진율 계산기",
   description: "원가, 판매가, 마진율을 계산합니다.",
   category: "business",
-  icon: Briefcase,
+  iconName: "Briefcase",
   inputs: [
     { id: "calculationType", label: "계산 방식", type: "select", options: [
       { value: "findMargin", label: "마진율 계산" },
@@ -922,7 +914,7 @@ const salaryCalculator: CalculatorConfig = {
   name: "연봉 실수령액 계산기",
   description: "연봉에서 4대보험과 세금을 공제한 실수령액을 계산합니다.",
   category: "business",
-  icon: Briefcase,
+  iconName: "Briefcase",
   inputs: [
     { id: "annualSalary", label: "연봉", type: "number", placeholder: "50000000", suffix: "원", defaultValue: 50000000 },
     { id: "dependents", label: "부양가족 수", type: "select", options: [
@@ -987,7 +979,7 @@ const severanceCalculator: CalculatorConfig = {
   name: "퇴직금 계산기",
   description: "근속기간과 급여로 퇴직금을 계산합니다.",
   category: "business",
-  icon: Briefcase,
+  iconName: "Briefcase",
   inputs: [
     { id: "startDate", label: "입사일 (년)", type: "number", placeholder: "2020", defaultValue: 2020 },
     { id: "endDate", label: "퇴사일 (년)", type: "number", placeholder: "2024", defaultValue: 2024 },
@@ -1041,7 +1033,7 @@ const gpaCalculator: CalculatorConfig = {
   name: "학점 계산기",
   description: "학점 평균(GPA)을 계산합니다.",
   category: "education",
-  icon: GraduationCap,
+  iconName: "GraduationCap",
   inputs: [
     { id: "gradeSystem", label: "학점 체계", type: "select", options: [
       { value: "4.5", label: "4.5 만점" },
@@ -1136,7 +1128,7 @@ const gradeCutCalculator: CalculatorConfig = {
   name: "등급컷 계산기",
   description: "상대평가 등급 기준을 계산합니다.",
   category: "education",
-  icon: GraduationCap,
+  iconName: "GraduationCap",
   inputs: [
     { id: "totalStudents", label: "총 인원", type: "number", placeholder: "100", suffix: "명", defaultValue: 100 },
     { id: "gradeSystem", label: "등급 체계", type: "select", options: [
@@ -1194,7 +1186,7 @@ const suneungCalculator: CalculatorConfig = {
   name: "수능점수 계산기",
   description: "수능 원점수로 표준점수와 등급을 계산합니다.",
   category: "education",
-  icon: GraduationCap,
+  iconName: "GraduationCap",
   inputs: [
     { id: "subject", label: "과목", type: "select", options: [
       { value: "korean", label: "국어" },
@@ -1292,7 +1284,7 @@ const scoreConvertCalculator: CalculatorConfig = {
   name: "환산점수 계산기",
   description: "다양한 시험 점수를 환산합니다.",
   category: "education",
-  icon: GraduationCap,
+  iconName: "GraduationCap",
   inputs: [
     { id: "conversionType", label: "환산 유형", type: "select", options: [
       { value: "100to4.5", label: "100점 → 4.5학점" },
@@ -1406,7 +1398,7 @@ const carTaxCalculator: CalculatorConfig = {
   name: "자동차세 계산기",
   description: "배기량과 차종으로 자동차세를 계산합니다.",
   category: "automotive",
-  icon: Car,
+  iconName: "Car",
   inputs: [
     { id: "vehicleType", label: "차종", type: "select", options: [
       { value: "passenger", label: "승용차 (비영업)" },
@@ -1481,7 +1473,7 @@ const fuelEfficiencyCalculator: CalculatorConfig = {
   name: "연비 계산기",
   description: "주행거리와 주유량으로 연비를 계산합니다.",
   category: "automotive",
-  icon: Car,
+  iconName: "Car",
   inputs: [
     { id: "distance", label: "주행거리", type: "number", placeholder: "500", suffix: "km", defaultValue: 500 },
     { id: "fuelUsed", label: "주유량", type: "number", placeholder: "40", suffix: "L", defaultValue: 40 },
@@ -1546,7 +1538,7 @@ const installmentCalculator: CalculatorConfig = {
   name: "자동차 할부금 계산기",
   description: "자동차 할부 구매 시 월 납입금을 계산합니다.",
   category: "automotive",
-  icon: Car,
+  iconName: "Car",
   inputs: [
     { id: "carPrice", label: "차량 가격", type: "number", placeholder: "30000000", suffix: "원", defaultValue: 30000000 },
     { id: "downPayment", label: "선수금", type: "number", placeholder: "5000000", suffix: "원", defaultValue: 5000000 },
@@ -1599,7 +1591,7 @@ const carInsuranceCalculator: CalculatorConfig = {
   name: "자동차 보험료 계산기",
   description: "자동차 보험료를 예상 계산합니다.",
   category: "automotive",
-  icon: Car,
+  iconName: "Car",
   inputs: [
     { id: "age", label: "운전자 나이", type: "number", placeholder: "35", suffix: "세", defaultValue: 35 },
     { id: "carAge", label: "차량 연식", type: "number", placeholder: "3", suffix: "년", defaultValue: 3 },

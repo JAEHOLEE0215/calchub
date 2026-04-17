@@ -5,11 +5,19 @@ import { Navbar } from "@/components/calc-hub/navbar"
 import { Footer } from "@/components/calc-hub/footer"
 import { CalculatorPage } from "@/components/calc-hub/calculator/calculator-page"
 
+// All valid slugs for static generation
+const validSlugs = [
+  "loan-interest", "savings-interest", "annuity", "exchange-rate",
+  "bmi", "bmr", "calorie", "body-fat",
+  "jeonse-loan", "acquisition-tax", "realtor-fee", "monthly-rent",
+  "vat", "margin", "salary", "severance",
+  "gpa", "grade-cut", "suneung", "score-convert",
+  "car-tax", "fuel-efficiency", "installment", "car-insurance",
+]
+
 // Generate static params for all 24 calculators
 export function generateStaticParams() {
-  return calculators.map((calc) => ({
-    slug: calc.slug,
-  }))
+  return validSlugs.map((slug) => ({ slug }))
 }
 
 // Generate metadata for SEO
@@ -61,9 +69,9 @@ export default async function CalculatorSlugPage({
   params: Promise<{ slug: string }> 
 }) {
   const { slug } = await params
-  const calculator = calculatorMap.get(slug)
-
-  if (!calculator) {
+  
+  // Validate slug exists
+  if (!validSlugs.includes(slug)) {
     notFound()
   }
 
@@ -71,7 +79,7 @@ export default async function CalculatorSlugPage({
     <>
       <Navbar />
       <main className="pt-16 md:pt-20">
-        <CalculatorPage config={calculator} />
+        <CalculatorPage slug={slug} />
       </main>
       <Footer />
     </>

@@ -3,13 +3,36 @@
 import { useState, useCallback, useEffect } from "react"
 import { motion } from "framer-motion"
 import Link from "next/link"
-import { Home, ChevronRight, Calculator, RotateCcw, Info } from "lucide-react"
 import { 
-  type CalculatorConfig, 
+  Home, 
+  ChevronRight, 
+  Calculator, 
+  RotateCcw, 
+  Info,
+  Wallet,
+  Heart,
+  Briefcase,
+  GraduationCap,
+  Car,
+  type LucideIcon
+} from "lucide-react"
+import { 
   type CalculatorResult,
+  type IconName,
+  calculatorMap,
   categoryInfo 
 } from "@/lib/calculators/config"
 import { Input } from "@/components/ui/input"
+
+// Icon map for rendering from string names
+const iconMap: Record<IconName, LucideIcon> = {
+  Wallet,
+  Heart,
+  Home,
+  Briefcase,
+  GraduationCap,
+  Car,
+}
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
@@ -30,11 +53,15 @@ import {
 } from "@/components/ui/breadcrumb"
 
 interface CalculatorPageProps {
-  config: CalculatorConfig
+  slug: string
 }
 
-export function CalculatorPage({ config }: CalculatorPageProps) {
+export function CalculatorPage({ slug }: CalculatorPageProps) {
+  // Get config from client-side map (functions stay on client)
+  const config = calculatorMap.get(slug)
+  
   const [inputValues, setInputValues] = useState<Record<string, string | number>>(() => {
+    if (!config) return {}
     const initial: Record<string, string | number> = {}
     config.inputs.forEach((input) => {
       initial[input.id] = input.defaultValue ?? ""
@@ -45,6 +72,7 @@ export function CalculatorPage({ config }: CalculatorPageProps) {
   const [result, setResult] = useState<CalculatorResult | null>(null)
 
   const handleCalculate = useCallback(() => {
+    if (!config) return
     try {
       const calculatedResult = config.calculate(inputValues)
       setResult(calculatedResult)
@@ -66,12 +94,28 @@ export function CalculatorPage({ config }: CalculatorPageProps) {
   }
 
   const handleReset = () => {
+    if (!config) return
     const initial: Record<string, string | number> = {}
     config.inputs.forEach((input) => {
       initial[input.id] = input.defaultValue ?? ""
     })
     setInputValues(initial)
     setResult(null)
+  }
+
+  // Handle invalid slug
+  if (!config) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-foreground mb-2">계산기를 찾을 수 없습니다</h1>
+          <p className="text-muted-foreground">요청하신 계산기가 존재하지 않습니다.</p>
+          <Link href="/" className="text-primary hover:underline mt-4 inline-block">
+            홈으로 돌아가기
+          </Link>
+        </div>
+      </div>
+    )
   }
 
   const categoryData = categoryInfo[config.category]
@@ -122,9 +166,14 @@ export function CalculatorPage({ config }: CalculatorPageProps) {
           className="mb-8"
         >
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center neon-border">
-              <config.icon className="w-6 h-6 text-primary" />
-            </div>
+            {(() => {
+              const IconComponent = iconMap[config.iconName]
+              return (
+                <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center neon-border">
+                  <IconComponent className="w-6 h-6 text-primary" />
+                </div>
+              )
+            })()}
             <div>
               <h1 className="text-2xl md:text-3xl font-bold text-foreground">{config.name}</h1>
               <p className="text-muted-foreground">{config.description}</p>

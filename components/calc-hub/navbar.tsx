@@ -14,9 +14,14 @@ const navLinks = [
   { name: "학업", href: "/categories/education" },
 ]
 
+const moreLinks = [
+  { name: "자동차 계산기", href: "/categories/automotive" },
+]
+
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const { scrollY } = useScroll()
 
   useMotionValueEvent(scrollY, "change", (latest) => {
@@ -68,15 +73,38 @@ export function Navbar() {
                   </motion.span>
                 </Link>
               ))}
-              <motion.button
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
-                className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-secondary"
+
+              {/* 더보기 dropdown */}
+              <div
+                className="relative"
+                onMouseEnter={() => setIsDropdownOpen(true)}
+                onMouseLeave={() => setIsDropdownOpen(false)}
               >
-                더보기
-                <ChevronDown className="w-4 h-4" />
-              </motion.button>
+                <motion.button
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-secondary"
+                >
+                  더보기
+                  <ChevronDown className="w-4 h-4" />
+                </motion.button>
+                {isDropdownOpen && (
+                  <div className="absolute top-full left-0 mt-1 w-48 rounded-xl bg-background border border-border shadow-lg py-2 z-50">
+                    {moreLinks.map((link) => (
+                      <Link
+                        key={link.name}
+                        href={link.href}
+                        onClick={() => setIsDropdownOpen(false)}
+                        className="block px-4 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+                      >
+                        {link.name}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Right side */}
@@ -129,6 +157,21 @@ export function Navbar() {
                   x: isMobileMenuOpen ? 0 : -20 
                 }}
                 transition={{ delay: index * 0.05 }}
+                className="block px-4 py-3 text-lg font-medium text-foreground hover:bg-secondary rounded-xl transition-colors"
+              >
+                {link.name}
+              </motion.span>
+            </Link>
+          ))}
+          {moreLinks.map((link, index) => (
+            <Link key={link.name} href={link.href} onClick={() => setIsMobileMenuOpen(false)}>
+              <motion.span
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ 
+                  opacity: isMobileMenuOpen ? 1 : 0, 
+                  x: isMobileMenuOpen ? 0 : -20 
+                }}
+                transition={{ delay: (navLinks.length + index) * 0.05 }}
                 className="block px-4 py-3 text-lg font-medium text-foreground hover:bg-secondary rounded-xl transition-colors"
               >
                 {link.name}

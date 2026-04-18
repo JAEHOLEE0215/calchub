@@ -18,7 +18,7 @@ export function Hero() {
       {/* Animated gradient background */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/10" />
       
-      {/* Animated grid pattern */}
+      {/* Animated grid pattern */}h
       <motion.div 
         className="absolute inset-0 opacity-20"
         style={{
@@ -101,7 +101,7 @@ export function Hero() {
         >
           금융, 건강, 생활, 비즈니스까지 — 모든 계산을 한 곳에서.
           <br />
-          <span className="text-foreground font-medium">50개 이상의 전문 계산기</span>로 복잡한 계산을 쉽고 빠르게.
+          <span className="text-foreground font-medium">24개의 전문 계산기</span>로 복잡한 계산을 쉽고 빠르게.
         </motion.p>
 
         {/* CTA Buttons */}
@@ -128,7 +128,7 @@ export function Hero() {
           className="mt-16 grid grid-cols-3 gap-8 max-w-xl mx-auto"
         >
           {[
-            { value: "50+", label: "계산기" },
+            { value: "24+", label: "계산기" },
             { value: "100만+", label: "월 사용자" },
             { value: "99.9%", label: "정확도" },
           ].map((stat, index) => (

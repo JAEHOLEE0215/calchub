@@ -53,6 +53,7 @@ export const metadata: Metadata = {
   },
   verification: {
     google: 'qaCv8np6GWod6h3KgZ_IPK5BI4sqNNb_eXx7W82dCW8',
+    other: { 'naver-site-verification': 'fa1766869fd85dc7377b028678d715386a9f2ba2' },
   },
   icons: {
     icon: [

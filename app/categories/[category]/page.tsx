@@ -56,7 +56,7 @@ export async function generateMetadata({
       locale: "ko_KR",
       images: [
         {
-          url: '/og-image.svg',
+          url: '/og-image.png',
           width: 1200,
           height: 630,
           alt: `${categoryData.name} 계산기 - CalcHub`,
@@ -67,7 +67,7 @@ export async function generateMetadata({
       card: "summary_large_image",
       title: `${categoryData.name} 계산기 | CalcHub`,
       description: `${categoryData.name} 관련 ${categoryCalculators.length}개의 전문 계산기`,
-      images: ['/og-image.svg'],
+      images: ['/og-image.png'],
     },
   }
 }

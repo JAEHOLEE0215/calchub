@@ -58,13 +58,13 @@ export async function generateMetadata({
       url: `/calculators/${slug}`,
       siteName: "CalcHub 계산기허브",
       locale: "ko_KR",
-      images: [{ url: '/og-image.svg', width: 1200, height: 630, alt: `${calculator.name} - CalcHub` }],
+      images: [{ url: '/og-image.png', width: 1200, height: 630, alt: `${calculator.name} - CalcHub` }],
     },
     twitter: {
       card: "summary_large_image",
       title: `${calculator.name} - 무료 온라인 계산기 | CalcHub`,
       description: calculator.description,
-      images: ['/og-image.svg'],
+      images: ['/og-image.png'],
     },
   }
 }

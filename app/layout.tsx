@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     description: '금융, 건강, 부동산, 비즈니스 등 24가지 전문 계산기를 무료로 제공합니다.',
     images: [
       {
-        url: '/og-image.svg',
+        url: '/og-image.png',
         width: 1200,
         height: 630,
         alt: 'CalcHub - 한국 No.1 무료 온라인 계산기',
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'CalcHub | 한국 No.1 무료 온라인 계산기 모음',
     description: '금융, 건강, 부동산, 비즈니스 등 24가지 전문 계산기를 무료로 제공합니다.',
-    images: ['/og-image.svg'],
+    images: ['/og-image.png'],
   },
   robots: {
     index: true,
